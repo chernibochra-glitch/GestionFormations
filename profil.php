@@ -1,7 +1,10 @@
 <?php
 $nom = "CHERNI";
-$prenom = "Bicha";
+$prenom = "Bochra";
 $email = "chernibochra43@gmail.com";
+$age = 20;
+$ville="Arianna";
+$formation="Gtic";
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -14,6 +17,10 @@ $email = "chernibochra43@gmail.com";
 <p><strong>Nom :</strong> <?= $nom ?></p>
 <p><strong>Prénom :</strong> <?= $prenom ?></p>
 <p><strong>Email :</strong> <?= $email ?></p>
+<p><strong>Âge :</strong> <?php echo $age; ?> ans</p>
+<p><strong>Ville :</strong> <?= $ville ?></p>
+<p><strong>Formation :</strong> <?= $formation ?></p>
+<p>Bienvenue Bochra dans la formation Gtic</p>
 <p>Date : <?= date("H:i:s") ?></p>
 </body>
 </html>
