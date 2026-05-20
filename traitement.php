@@ -1,27 +1,40 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-$nom = trim($_POST["nom"]);
-$prenom = trim($_POST["prenom"]);
-$email = trim($_POST["email"]);
-$erreur = "";
-if (empty($nom)) {
-$erreur .= "Le nom est obligatoire.<br>";
+require 'includes/connexion.php';
+require 'includes/validation.php';
+require 'includes/fonctions.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Récupérer et nettoyer les données du formulaire
+$nom = trim($_POST['nom'] ?? '');
+$prenom = trim($_POST['prenom'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$formation_id = (int)($_POST['formation_id'] ?? 0);
+// Validation (fonctions du TP4)
+$erreur = validerFormulaire($nom, $prenom, $email);
+if ($formation_id <= 0) {
+$erreur .= 'Veuillez choisir une formation.<br>';
 }
-if (empty($prenom)) {
-$erreur .= "Le prénom est obligatoire.<br>";
-}
-if (empty($email)) {
-$erreur .= "L'email est obligatoire.<br>";
-}
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-$erreur .= "Format email invalide.<br>";
-}
-}
-// Affichage des erreurs
 if (!empty($erreur)) {
-echo "<div style='color:red;'>$erreur</div>";
+// Afficher les erreurs et arrêter le traitement
+echo afficherErreur($erreur);
 } else {
-echo "<div style='color:green;'>Formulaire valide ✔</div>";
-echo "Nom : $nom <br> Prénom : $prenom <br> Email : $email"; }
+// Tout est valide → Insérer en base de données
+$pdo = getConnexion();
+// 1. Préparer la requête avec des marqueurs ? (placeholders)
+// Les ? seront remplacés par les vraies valeurs à l'étape execute()
+$stmt = $pdo->prepare(
+'INSERT INTO inscriptions (nom, prenom, email, formation_id, statut_paiement,
 
+date_inscription)'
+
+. ' VALUES (?, ?, ?, ?, "en_attente", NOW())'
+);
+// 2. Exécuter avec les vraies valeurs dans l'ordre des ?
+$stmt->execute([$nom, $prenom, $email, $formation_id]);
+// 3. Récupérer l'ID de la ligne insérée
+$id = $pdo->lastInsertId();
+// Rediriger vers la page de paiement avec l'ID
+header('Location: paiement.php?id=' . $id);
+exit();
+}
+}
 ?>
